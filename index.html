@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christian Dale C. Catud — Virtual Assistant Portfolio</title>
+
+<!-- FONTS — exact spec -->
+<link rel="stylesheet" href="https://db.onlinewebfonts.com/c/5ac3fe7c6abd2f62067f266d89671492?family=HelveticaNowDisplay-Medium">
+<link rel="stylesheet" href="https://db.onlinewebfonts.com/c/1aa3377e489837a26d019bba501e779d?family=HelveticaNowDisplayW01-Rg">
+
+<style>
+/* ── FONT VARIABLES — exact spec ── */
+:root {
+  --font-heading: 'HelveticaNowDisplay-Medium', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'HelveticaNowDisplayW01-Rg', 'Helvetica Neue', Arial, sans-serif;
+
+  --off-white: #F5F2EC;
+  --black: #000000;
+  --muted: #666660;
+  --gold: #C8A84B;
+  --border: rgba(0,0,0,0.10);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--off-white);
+  color: var(--black);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── CURSOR blink animation ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── BACKGROUND VIDEO — exact spec ── */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% center;
+  pointer-events: none;
+}
+
+/* ── NAVBAR — exact spec ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem; /* py-4 px-5 */
+  background: rgba(245,242,236,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+@media (min-width: 640px) {
+  nav { padding: 1.25rem 2rem; } /* sm:py-5 sm:px-8 */
+}
+
+/* Logo left — exact spec */
+.nav-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* gap-3 */
+}
+.nav-logo-text {
+  font-family: var(--font-heading);
+  font-size: 21px;
+  letter-spacing: -0.02em; /* tracking-tight */
+  color: var(--black);
+  line-height: 1;
+}
+@media (min-width: 640px) { .nav-logo-text { font-size: 26px; } }
+
+.nav-logo-asterisk {
+  font-size: 25px;
+  color: var(--black);
+  user-select: none;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+@media (min-width: 640px) { .nav-logo-asterisk { font-size: 30px; } }
+
+/* Center nav links — exact spec: hidden below md */
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 0; /* commas handle spacing */
+  font-size: 23px;
+  color: var(--black);
+  list-style: none;
+}
+@media (min-width: 768px) { .nav-links { display: flex; } }
+
+.nav-links li a {
+  color: var(--black);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.nav-links li a:hover { opacity: 0.6; }
+/* comma separator */
+.nav-links li::after { content: ','; margin-right: 0.45em; }
+.nav-links li:last-child::after { content: ''; }
+
+/* Right CTA — exact spec: hidden below md */
+.nav-cta {
+  display: none;
+  font-size: 23px;
+  color: var(--black);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.6; }
+@media (min-width: 768px) { .nav-cta { display: block; } }
+
+/* Mobile hamburger — exact spec: visible below md */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+@media (min-width: 768px) { .hamburger { display: none; } }
+
+.hamburger span {
+  display: block;
+  width: 24px; /* w-6 */
+  height: 2px;  /* h-[2px] */
+  background: var(--black);
+  transition: all 300ms;
+  transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile overlay — exact spec */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 2rem; /* px-8 */
+  gap: 2rem; /* gap-8 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.mobile-overlay.open { opacity: 1; pointer-events: all; }
+@media (min-width: 768px) { .mobile-overlay { display: none !important; } }
+
+.mobile-overlay a {
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--black);
+  text-decoration: none;
+}
+.mobile-overlay a:last-child { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── HERO SECTION — exact spec ── */
+#hero {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* mobile: justify-end */
+  padding-bottom: 3rem;      /* mobile: pb-12 */
+  padding-left: 1.25rem;     /* mobile: px-5 */
+  padding-right: 1.25rem;
+  overflow: hidden;
+}
+
+/* Gradient overlay so text stays readable over any video frame */
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    120deg,
+    rgba(245,242,236,0.82) 0%,
+    rgba(245,242,236,0.55) 55%,
+    rgba(245,242,236,0.10) 100%
+  );
+  pointer-events: none;
+}
+@media (min-width: 640px) {
+  #hero { padding-left: 2rem; padding-right: 2rem; } /* sm:px-8 */
+}
+@media (min-width: 768px) {
+  #hero {
+    justify-content: center; /* md:justify-center */
+    padding-bottom: 0;       /* md:pb-0 */
+    padding-left: 2.5rem;    /* md:px-10 */
+    padding-right: 2.5rem;
+  }
+}
+
+/* Content container — sits above the gradient overlay */
+.hero-content {
+  max-width: 36rem; /* max-w-xl */
+  position: relative;
+  z-index: 2;
+}
+
+/* 1. Blurred intro label — exact spec */
+.hero-blur-label {
+  pointer-events: none;
+  user-select: none;
+  margin-bottom: 1.25rem; /* mb-5 */
+  font-size: clamp(18px, 4vw, 26px);
+  line-height: 1.3;
+  font-weight: 400;
+  color: #000;
+  filter: blur(4px);
+  white-space: pre-line;
+}
+@media (min-width: 640px) { .hero-blur-label { margin-bottom: 1.5rem; } /* sm:mb-6 */ }
+
+/* 2. Typewriter paragraph — exact spec */
+.hero-typewriter {
+  color: #000;
+  margin-bottom: 1.25rem; /* mb-5 */
+  font-size: clamp(18px, 4vw, 26px);
+  line-height: 1.35;
+  font-weight: 400;
+  min-height: 54px;
+}
+@media (min-width: 640px) { .hero-typewriter { margin-bottom: 1.5rem; } /* sm:mb-6 */ }
+
+/* Blinking cursor — exact spec */
+.blink-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: #000;
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+/* 3. Pills container — exact spec */
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0; /* gap-y-1 handled by mb on each pill */
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.hero-pills.visible { opacity: 1; transform: translateY(0); }
+
+/* White pill buttons — exact spec */
+.pill-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: black;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 9999px;
+  font-size: 13px;
+  padding: 0.3em 1rem;   /* px-4 */
+  margin: 0 0.2em 0.4em; /* mx-[0.2em] mb-[0.4em] */
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 200ms, color 200ms;
+  font-family: var(--font-body);
+  text-decoration: none;
+}
+@media (min-width: 640px) {
+  .pill-white { font-size: 15px; padding: 0.3em 1.25rem; } /* sm:text-[15px] sm:px-5 */
+}
+.pill-white:hover { background: black; color: white; }
+
+/* Outline email pill — adapted for light overlay visibility */
+.pill-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;   /* gap-2 */
+  background: transparent;
+  color: var(--black);
+  border: 1px solid var(--black);
+  border-radius: 9999px;
+  font-size: 13px;
+  padding: 0.3em 1rem;
+  margin: 0 0.2em 0.4em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 200ms, color 200ms;
+  font-family: var(--font-body);
+}
+@media (min-width: 640px) {
+  .pill-outline { font-size: 15px; padding: 0.3em 1.25rem; gap: 0.75rem; } /* sm:gap-3 */
+}
+.pill-outline:hover { background: var(--black); color: white; }
+.pill-outline .email-underline { text-decoration: underline; text-underline-offset: 1px; }
+
+/* ── SCROLL SECTIONS (below hero) ── */
+.page-body {
+  position: relative;
+  z-index: 5;
+  background: var(--off-white);
+}
+
+/* Thin top rule to separate hero from body */
+.page-body-inner {
+  border-top: 1px solid rgba(0,0,0,0.10);
+}
+
+section.content-section {
+  padding: 5rem 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+@media (min-width: 640px) { section.content-section { padding: 5rem 2rem; } }
+@media (min-width: 768px) { section.content-section { padding: 5rem 2.5rem; } }
+
+.section-tag {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.08;
+  color: var(--black);
+  margin-bottom: 1.75rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+p.body-text {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.85;
+  max-width: 680px;
+}
+p.body-text + p.body-text { margin-top: 1.25rem; }
+
+strong { color: var(--black); font-weight: 500; }
+.gold { color: var(--gold); }
+
+/* ── SKILLS GRID ── */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  margin-top: 2rem;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.skill-card {
+  background: var(--off-white);
+  padding: 1.5rem;
+  transition: background 0.2s;
+  cursor: default;
+}
+.skill-card:hover { background: rgba(200,168,75,0.06); }
+.skill-icon { font-size: 22px; margin-bottom: 0.75rem; }
+.skill-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 0.4rem; color: var(--black); }
+.skill-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── TOOLS ── */
+.tools-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.tool-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 4px; padding: 6px 14px;
+  font-size: 13px; color: var(--black);
+  transition: border-color 0.2s, color 0.2s;
+}
+.tool-tag:hover { border-color: var(--gold); color: var(--gold); }
+.tool-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.chatgpt-box {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-left: 3px solid var(--gold);
+  padding: 1.5rem;
+}
+.chatgpt-box ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+.chatgpt-box li { font-size: 13px; color: var(--muted); display: flex; gap: 0.6rem; }
+.chatgpt-box li::before { content: '→'; color: var(--gold); flex-shrink: 0; }
+
+/* ── SYSTEMS ── */
+.systems-list { margin-top: 2rem; }
+.system-item {
+  display: flex; align-items: flex-start; gap: 1.5rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  transition: padding-left 0.2s;
+  cursor: default;
+}
+.system-item:first-child { border-top: 1px solid rgba(0,0,0,0.08); }
+.system-item:hover { padding-left: 0.5rem; }
+.sys-num { font-size: 1.5rem; color: rgba(0,0,0,0.14); min-width: 2.4rem; line-height: 1; transition: color 0.2s; font-style: italic; }
+.system-item:hover .sys-num { color: var(--gold); }
+.sys-content h3 { font-size: 15px; font-weight: 500; color: var(--black); margin-bottom: 0.25rem; }
+.sys-content p { font-size: 13px; color: var(--muted); }
+
+/* ── WHY ── */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  margin-top: 2rem;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.why-card { background: var(--off-white); padding: 1.75rem 1.25rem; transition: background 0.2s; }
+.why-card:hover { background: rgba(200,168,75,0.07); }
+.why-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+.why-card h3 { font-size: 14px; font-weight: 500; color: var(--black); margin-bottom: 0.3rem; }
+.why-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+.quote-block { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(0,0,0,0.08); }
+.quote-text { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--black); line-height: 1.65; font-style: italic; }
+.quote-attr { font-size: 12px; color: var(--gold); margin-top: 0.75rem; }
+
+/* ── SAMPLE WORK ── */
+.tabs { display: flex; border-bottom: 1px solid rgba(0,0,0,0.1); margin-bottom: 2rem; overflow-x: auto; }
+.tab { padding: 0.75rem 1.25rem; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; white-space: nowrap; margin-bottom: -1px; }
+.tab.active { color: var(--black); border-bottom-color: var(--black); }
+.tab:hover { color: var(--black); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.sample-box { border: 1px solid rgba(0,0,0,0.10); padding: 1.75rem; }
+.sample-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+.sample-desc { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+.reply-body { background: #fff; border: 1px solid rgba(0,0,0,0.08); padding: 1.25rem; font-size: 13px; line-height: 1.9; white-space: pre-line; color: var(--black); }
+.sheet-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sheet-table th { background: rgba(200,168,75,0.10); color: var(--black); font-weight: 500; text-align: left; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.08); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.sheet-table td { padding: 8px 12px; border: 1px solid rgba(0,0,0,0.08); color: var(--black); }
+.status-done { color: #2d9c7e; font-weight: 500; }
+.status-pending { color: #b8860b; font-weight: 500; }
+.status-follow { color: #c0392b; font-weight: 500; }
+.caption-box { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-left: 3px solid var(--gold); padding: 1.5rem; }
+.caption-box p { font-size: 14px; color: var(--black); line-height: 1.9; }
+.sample-note { font-size: 12px; color: var(--muted); margin-top: 1rem; }
+
+/* ── TIMELINE ── */
+.timeline { margin-top: 2rem; position: relative; padding-left: 2.5rem; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.18) 20%, rgba(0,0,0,0.18) 80%, transparent); }
+.timeline-item { margin-bottom: 2.5rem; position: relative; }
+.timeline-dot { position: absolute; left: -2.8rem; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--off-white); border: 2px solid rgba(0,0,0,0.3); transition: border-color 0.2s, background 0.2s; }
+.timeline-item:hover .timeline-dot { background: var(--gold); border-color: var(--gold); }
+.timeline-phase { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.35rem; }
+.timeline-item h3 { font-size: 15px; font-weight: 500; color: var(--black); margin-bottom: 0.75rem; }
+.timeline-tasks { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.timeline-tasks li { font-size: 13px; color: var(--muted); display: flex; align-items: flex-start; gap: 0.6rem; }
+.timeline-tasks li::before { content: '—'; color: var(--muted); opacity: 0.5; flex-shrink: 0; }
+
+/* ── CONTACT ── */
+#contact-section { text-align: center; }
+#contact-section h2 { margin-bottom: 1rem; }
+#contact-section .body-text { margin: 0 auto 2rem; }
+.contact-links { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.contact-link { display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(0,0,0,0.12); padding: 0.4em 1.1em; border-radius: 9999px; font-size: 13px; color: var(--black); text-decoration: none; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+.contact-link:hover { background: var(--black); color: #fff; border-color: var(--black); }
+.contact-meta { font-size: 13px; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer { text-align: center; padding: 2.5rem; font-size: 12px; color: var(--muted); border-top: 1px solid rgba(0,0,0,0.08); position: relative; z-index: 5; background: var(--off-white); }
+footer .footer-name { font-size: 1rem; color: var(--black); font-style: italic; display: block; margin-bottom: 4px; }
+
+/* ── SCROLL REVEAL ── */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── MARQUEE ── */
+.marquee-wrap { overflow: hidden; border-top: 1px solid rgba(0,0,0,0.08); border-bottom: 1px solid rgba(0,0,0,0.08); padding: 0.7rem 0; background: var(--off-white); position: relative; z-index: 5; }
+.marquee-track { display: flex; white-space: nowrap; animation: marquee 30s linear infinite; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee-item { display: inline-flex; align-items: center; gap: 1rem; padding: 0 2rem; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.marquee-sep { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     BACKGROUND VIDEO — exact spec
+══════════════════════════════════════ -->
+<video
+  id="bg-video"
+  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4"
+  muted
+  playsinline
+  preload="auto"
+></video>
+
+<!-- ══════════════════════════════════════
+     NAVBAR — exact spec
+══════════════════════════════════════ -->
+<nav>
+  <!-- Logo left -->
+  <div class="nav-logo-wrap">
+    <span class="nav-logo-text">CDC®</span>
+    <span class="nav-logo-asterisk" aria-hidden="true">✳︎</span>
+  </div>
+
+  <!-- Desktop nav links center -->
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#work">Work</a></li>
+        <li><a href="#contact-section">Contact</a></li>
+  </ul>
+
+  <!-- Desktop CTA right -->
+  <a href="mailto:christianccatud@gmail.com" class="nav-cta">Hire me</a>
+
+  <!-- Mobile hamburger -->
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- Mobile overlay -->
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="#about"           onclick="closeMenu()">About</a>
+  <a href="#skills"          onclick="closeMenu()">Skills</a>
+  <a href="#work"            onclick="closeMenu()">Work</a>
+    <a href="#contact-section" onclick="closeMenu()">Contact</a>
+  <a href="mailto:christianccatud@gmail.com" onclick="closeMenu()">Hire me</a>
+</div>
+
+<!-- ══════════════════════════════════════ 
+     HERO — exact spec
+══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-content">
+
+    <!-- 1. Blurred intro label — exact spec -->
+    <div class="hero-blur-label" aria-hidden="true">Hey there, meet C.D.C,
+Virtual Assistant — Admin &amp; Executive Ready</div>
+
+    <!-- 2. Typewriter paragraph — exact spec -->
+    <p class="hero-typewriter">
+      <span id="tw-text"></span><span class="blink-cursor" id="tw-cursor"></span>
+    </p>
+
+    <!-- 3. Action pill buttons — exact spec -->
+    <div class="hero-pills" id="heroPills">
+      <!-- 4 white pill buttons -->
+      <a href="#work"            class="pill-white">View my work</a>
+      <a href="#skills"          class="pill-white">See my skills</a>
+      <a href="#contact-section" class="pill-white">Let's work together</a>
+      
+      <!-- 1 outline email pill -->
+      <button class="pill-outline" id="emailPill" type="button">
+        Reach me: <span class="email-underline">christianccatud@gmail.com</span>
+        <!-- copy icon — inline SVG two overlapping rectangles, 12×12 -->
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="0.5" y="2.5" width="7" height="9" rx="1" stroke="currentColor"/>
+          <rect x="4.5" y="0.5" width="7" height="9" rx="1" fill="currentColor" fill-opacity="0.15" stroke="currentColor"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     REST OF PAGE (sits on top of white bg)
+══════════════════════════════════════ -->
+<div class="page-body">
+  <div class="page-body-inner">
+
+    <!-- MARQUEE -->
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item">Admin VA <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Organizing Data <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Email Management <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Customer Replies <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Google Sheets <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">AI-Assisted Writing <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Canva Design <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Workflow Systems <span class="marquee-sep">✳</span></span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee-item">Admin VA <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Organizing Data <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Email Management <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Customer Replies <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Google Sheets <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">AI-Assisted Writing <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Canva Design <span class="marquee-sep">✳</span></span>
+        <span class="marquee-item">Workflow Systems <span class="marquee-sep">✳</span></span>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section id="about" class="content-section reveal">
+      <div class="section-tag">About Me</div>
+      <h2>Who I Am &amp; How I Help</h2>
+      <p class="body-text">Hi! I'm <strong>Christian Dale</strong>, a beginner Virtual Assistant based in the Philippines. I am training to become a reliable admin and executive VA who helps business owners run smoother operations without burning out.</p>
+      <p class="body-text">I know what it feels like to have too many tasks and too little time. That's exactly why I focus on <strong class="gold">organizing information, handling customer messages, tracking data, and using AI tools</strong> to get more done — faster and smarter.</p>
+      <p class="body-text">I may be a beginner, but I come prepared with tools, systems, and a strong commitment to learning quickly. My goal is simple: <strong>to be someone you can trust with your admin work.</strong></p>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="content-section reveal">
+      <div class="section-tag">What I Can Do</div>
+      <h2>My Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-card"><div class="skill-icon">📂</div><h3>Organizing Data</h3><p>I sort and organize customer information, files, and records so you can find what you need in seconds — not hours.</p></div>
+        <div class="skill-card"><div class="skill-icon">🔍</div><h3>Online Research</h3><p>I find leads, suppliers, contacts, competitors, or any information you need — quickly and with clear summaries.</p></div>
+        <div class="skill-card"><div class="skill-icon">💬</div><h3>Email &amp; Message Replies</h3><p>I write polite, professional replies to customer messages and emails so your clients never feel ignored.</p></div>
+        <div class="skill-card"><div class="skill-icon">📊</div><h3>Google Sheets &amp; Excel</h3><p>I build simple tracking sheets for orders, leads, tasks, or follow-ups — so nothing slips through the cracks.</p></div>
+        <div class="skill-card"><div class="skill-icon">🎨</div><h3>Canva Basic Design</h3><p>I create simple social media posts, captions, and basic graphics using Canva to keep your page active.</p></div>
+        <div class="skill-card"><div class="skill-icon">🤖</div><h3>AI-Assisted Writing</h3><p>I use ChatGPT to write faster — drafting templates, improving messages, and summarizing long texts for you.</p></div>
+        <div class="skill-card"><div class="skill-icon">⚙️</div><h3>Basic Workflow Systems</h3><p>I set up simple systems for managing your customer communication, follow-ups, and daily admin tasks.</p></div>
+        <div class="skill-card"><div class="skill-icon">🛒</div><h3>Online Selling &amp; Admin</h3><p>Experience with product listings, customer inquiries, and basic order tracking for online stores.</p></div>
+
+        <div class="skill-card"><div class="skill-icon">📅</div><h3>Calendar &amp; Task Management</h3><p>I help manage schedules, organize appointments, set reminders, and keep tasks on track so important deadlines and meetings are never missed.</p></div>
+
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section id="tools" class="content-section reveal">
+      <div class="section-tag">My Toolkit</div>
+      <h2>Tools I Use</h2>
+      <p class="body-text">I work with practical, beginner-friendly tools that get real results — fast.</p>
+      
+<div class="tools-row">
+        <div class="tool-tag"><span class="tool-dot" style="background:#10A37F"></span>ChatGPT</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#D97706"></span>Claude</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#007ACC"></span>VS Code</div>
+
+        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Workspace</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#217346"></span>Microsoft 365</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Sheets</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Docs</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Drive</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#217346"></span>Microsoft Excel</div>
+
+        <div class="tool-tag"><span class="tool-dot" style="background:#4A154B"></span>Slack</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#6264A7"></span>Microsoft Teams</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#00897B"></span>Google Meet</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#2D8CFF"></span>Zoom</div>
+
+        <div class="tool-tag"><span class="tool-dot" style="background:#0052CC"></span>Asana</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#1877F2"></span>Meta Business Suite</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#1877F2"></span>Facebook</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#00C4CC"></span>Canva</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#25D366"></span>WhatsApp / Messenger</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#EA4335"></span>Email / Gmail</div>
+        <div class="tool-tag"><span class="tool-dot" style="background:#C0392B"></span>VICIdial</div>
+      </div>
+      <div class="chatgpt-box">
+
+        <div class="section-tag">How I Use ChatGPT</div>
+        <ul>
+          <li>Writing and improving customer reply messages</li>
+          <li>Creating email templates and scripts</li>
+          <li>Summarizing long articles or documents into simple points</li>
+          <li>Generating ideas for captions and content posts</li>
+          <li>Helping draft polished messages even when I'm unsure of wording</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SYSTEMS -->
+    <section id="systems" class="content-section reveal">
+      <div class="section-tag">What I Can Build For You</div>
+      <h2>Systems I Can Create</h2>
+      <p class="body-text">These are ready-to-use systems I can set up for your business — no complicated software needed.</p>
+      <div class="systems-list">
+        <div class="system-item">
+          <div class="sys-num">01</div>
+          <div class="sys-content"><h3>Customer Message Tracking System</h3><p>A Google Sheets tracker that logs every customer message, who sent it, what they asked, and whether it was answered. Never miss a customer again.</p></div>
+        </div>
+        <div class="system-item">
+          <div class="sys-num">02</div>
+          <div class="sys-content"><h3>Follow-Up Reminder System</h3><p>A spreadsheet that tells you exactly which customers to follow up with today — automatically highlighted by date so you always stay on top of leads.</p></div>
+        </div>
+        <div class="system-item">
+          <div class="sys-num">03</div>
+          <div class="sys-content"><h3>AI-Assisted Reply Template Library</h3><p>A folder of ready-to-send reply templates for the most common customer questions — written with ChatGPT and customized for your brand tone.</p></div>
+        </div>
+        <div class="system-item">
+          <div class="sys-num">04</div>
+          <div class="sys-content"><h3>Simple Customer Communication Workflow</h3><p>A step-by-step guide for your team (or just you) on how to receive, reply, track, and follow up with customers — so nothing falls through the cracks.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY -->
+    <section id="why" class="content-section reveal">
+      <div class="section-tag">The Value I Deliver</div>
+      <h2>Why Hire Me?</h2>
+      <div class="why-grid">
+        <div class="why-card"><div class="why-icon">⚡</div><h3>Faster Responses</h3><p>I help your business reply to customers quickly — so you never lose a sale because of a slow response.</p></div>
+        <div class="why-card"><div class="why-icon">🗂️</div><h3>Better Organization</h3><p>I keep your customer data, tasks, and files organized so you spend less time searching and more time growing.</p></div>
+        <div class="why-card"><div class="why-icon">🤖</div><h3>Smarter with AI</h3><p>I use ChatGPT to work faster — creating templates, drafting messages, and saving you hours every week.</p></div>
+        <div class="why-card"><div class="why-icon">📉</div><h3>Less Workload</h3><p>I take the admin tasks off your plate so you can focus on the high-value work only you can do.</p></div>
+      </div>
+      <div class="quote-block">
+        <p class="quote-text">"I may be a beginner, but I bring dedication, a fast-learning mindset, and real tools that make a difference from day one. I show up, I follow through, and I grow with you."</p>
+        <p class="quote-attr">— Christian Dale C. Catud</p>
+      </div>
+    </section>
+
+    <!-- SAMPLE WORK -->
+    <section id="work" class="content-section reveal">
+      <div class="section-tag">Proof of Skill</div>
+      <h2>Sample Work</h2>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('reply', this)">Customer Reply</div>
+        <div class="tab" onclick="showTab('tracker', this)">Sheets Tracker</div>
+        <div class="tab" onclick="showTab('caption', this)">Canva Caption</div>
+      </div>
+      <div id="tab-reply" class="tab-content active">
+        <div class="sample-box">
+          <div class="sample-label">AI-Assisted Customer Reply Template</div>
+          <p class="sample-desc">Scenario: Customer asks about order status and is frustrated about a delay.</p>
+          <div class="reply-body">Hi [Customer Name],
+
+Thank you so much for reaching out, and I sincerely apologize for the delay with your order.
+
+I completely understand how frustrating this can be, and I want to assure you that your order is our priority. Here is a quick update:
+
+📦 Order #[Order Number]
+📍 Current Status: In Transit
+🗓️ Expected Delivery: [Date]
+
+If it does not arrive by [Date + 2 days], please don't hesitate to message us and we will resolve this for you right away.
+
+We appreciate your patience and your trust in us. Thank you for being a valued customer! 😊
+
+Warm regards,
+[Your Name]
+[Business Name] Customer Support</div>
+          <p class="sample-note">✦ Written with ChatGPT guidance and customized for professional, friendly tone</p>
+        </div>
+      </div>
+      <div id="tab-tracker" class="tab-content">
+        <div class="sample-box">
+          <div class="sample-label">Google Sheets — Customer Follow-Up Tracker</div>
+          <p class="sample-desc">This is the structure of a tracker I can build for your business in Google Sheets.</p>
+          <div style="overflow-x:auto">
+            <table class="sheet-table">
+              <thead><tr><th>ID</th><th>Customer Name</th><th>Follow-Up Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>001</td><td>Maria Santos</td><td>June 1, 2025</td><td class="status-done">✓ Done</td></tr>
+                <tr><td>002</td><td>Jose Reyes</td><td>June 3, 2025</td><td class="status-pending">⏳ Pending</td></tr>
+                <tr><td>003</td><td>Anna Cruz</td><td>May 30, 2025</td><td class="status-follow">⚠ Follow Up Now</td></tr>
+                <tr><td>004</td><td>Mark Dela Cruz</td><td>June 5, 2025</td><td class="status-pending">⏳ Pending</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="sample-note">✦ Color-coded by status, with auto-highlight for overdue follow-ups</p>
+        </div>
+      </div>
+      <div id="tab-caption" class="tab-content">
+        <div class="sample-box">
+          <div class="sample-label">Canva Post — Caption Concept</div>
+          <p class="sample-desc">Sample caption for a small business product post. Design created in Canva.</p>
+          <div class="caption-box">
+            <p>✨ Freshly restocked and ready for you! 🎉
+
+Our bestselling [Product Name] is back — and this time, we made sure to stock up! 🙌
+
+Don't miss out. Last time, it sold out in 24 hours.
+
+👉 DM us now to reserve yours
+📦 Free delivery for orders above ₱500
+💳 GCash &amp; Cash on Delivery accepted
+
+Drop a ❤️ if you want this!
+
+#ShopLocal #[YourBrandName] #NewStock #Restocked #PhilippinesShopping</p>
+          </div>
+          <p class="sample-note">✦ Designed for engagement — written with ChatGPT, formatted for Instagram/Facebook</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact-section" class="content-section reveal" style="text-align:center">
+      <div class="section-tag">Let's Work Together</div>
+      <h2>Get In Touch</h2>
+      <p class="body-text" style="max-width:480px;margin:0 auto 2rem">If you're looking for a reliable, detail-oriented Virtual Assistant who leverages AI and modern productivity tools to streamline operations, improve efficiency, and support business growth, I'd be glad to help.</p>
+      <div class="contact-links">
+        <a href="mailto:christianccatud@gmail.com" class="contact-link">📧 Email Me</a>
+        <a href="https://www.linkedin.com/in/christian-dale-catud-71857136a/" target="_blank" class="contact-link">💼 LinkedIn</a>
+        <a href="https://www.facebook.com/christian.catud.1#" target="_blank" class="contact-link">💬 Message on Messenger</a>
+        <a href="https://v2.onlinejobs.ph/jobseekers/info/4488540" target="_blank"  class="contact-link">🌐 OnlineJobs.ph Profile</a>
+      </div>
+      <p class="contact-meta">📍 Based in the Philippines &nbsp;·&nbsp; Available for remote work worldwide &nbsp;·&nbsp; PHT (UTC+8)</p>
+    </section>
+
+  </div><!-- /page-body-inner -->
+</div><!-- /page-body -->
+
+<footer>
+  <span class="footer-name">Christian Dale C. Catud</span>
+  Virtual Assistant — Executive / Admin / AI-Assisted &nbsp;·&nbsp; Catud Portfolio 2026
+</footer>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<script>
+/* ── BACKGROUND VIDEO MOUSE-SCRUB — exact spec ── */
+(function () {
+  const video = document.getElementById('bg-video');
+  const SENSITIVITY = 0.8;
+  let prevX = null;
+  let targetTime = 0;
+  let seeking = false;
+
+  video.addEventListener('loadedmetadata', () => {
+    video.currentTime = 0;
+  });
+
+  video.addEventListener('seeked', () => {
+    seeking = false;
+    // if target moved while we were seeking, seek again
+    if (Math.abs(video.currentTime - targetTime) > 0.01) {
+      seeking = true;
+      video.currentTime = targetTime;
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (prevX === null) { prevX = e.clientX; return; }
+    const delta = e.clientX - prevX;
+    prevX = e.clientX;
+
+    if (!video.duration) return;
+    const offset = (delta / window.innerWidth) * SENSITIVITY * video.duration;
+    targetTime = Math.max(0, Math.min(video.duration, (targetTime || video.currentTime) + offset));
+
+    if (!seeking) {
+      seeking = true;
+      video.currentTime = targetTime;
+    }
+  });
+})();
+
+/* ── HAMBURGER MENU ── */
+const hamburger = document.getElementById('hamburger');
+const mobileOverlay = document.getElementById('mobileOverlay');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileOverlay.classList.toggle('open');
+});
+function closeMenu() {
+  hamburger.classList.remove('open');
+  mobileOverlay.classList.remove('open');
+}
+
+/* ── TYPEWRITER — exact spec ── */
+(function () {
+  const text = "Glad you stopped in. Good taste tends to find good VAs. Let's talk about what I can build for you.";
+  const el = document.getElementById('tw-text');
+  const cur = document.getElementById('tw-cursor');
+  let i = 0;
+
+  setTimeout(() => {
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        el.textContent = text.slice(0, ++i);
+      } else {
+        clearInterval(interval);
+        cur.style.display = 'none'; // cursor disappears when done
+      }
+    }, 38); // speed: 38ms per character
+  }, 600);  // startDelay: 600ms
+})();
+
+/* ── HERO PILLS REVEAL — exact spec: 400ms after load, independent of typewriter ── */
+setTimeout(() => {
+  document.getElementById('heroPills').classList.add('visible');
+}, 400);
+
+/* ── EMAIL COPY ── */
+document.getElementById('emailPill').addEventListener('click', () => {
+  navigator.clipboard.writeText('christianccatud@gmail.com').catch(() => {});
+});
+
+/* ── TABS ── */
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+/* ── SCROLL REVEAL ── */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.07 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+</body>
+</html>
