@@ -49,6 +49,22 @@ body {
   object-fit: cover;
   object-position: 70% center;
   pointer-events: none;
+  /* Safari fix */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Fallback animated gradient when video can't play (iOS Low Power, etc.) */
+@keyframes bgShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+body.no-video #bg-video { display: none; }
+body.no-video #hero {
+  background: linear-gradient(135deg, #e8e4dc, #d4cfc5, #c8c0b0, #e0dbd2);
+  background-size: 300% 300%;
+  animation: bgShift 10s ease infinite;
 }
 
 /* ── NAVBAR — exact spec ── */
@@ -511,8 +527,12 @@ footer .footer-name { font-size: 1rem; color: var(--black); font-style: italic; 
   id="bg-video"
   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4"
   muted
+  autoplay
+  loop
   playsinline
+  webkit-playsinline
   preload="auto"
+  disablepictureinpicture
 ></video>
 
 <!-- ══════════════════════════════════════
@@ -642,6 +662,9 @@ Virtual Assistant — Admin &amp; Executive Ready</div>
         <div class="skill-card"><div class="skill-icon">🛒</div><h3>Online Selling &amp; Admin</h3><p>Experience with product listings, customer inquiries, and basic order tracking for online stores.</p></div>
 
         <div class="skill-card"><div class="skill-icon">📅</div><h3>Calendar &amp; Task Management</h3><p>I help manage schedules, organize appointments, set reminders, and keep tasks on track so important deadlines and meetings are never missed.</p></div>
+        <div class="skill-card"><div class="skill-icon">🎮</div><h3>Vibe Coding</h3><p>I use AI-assisted tools to build simple functional web pages, portfolio sites, and lightweight tools — no complex setup, just clean results that work.</p></div>
+        <div class="skill-card"><div class="skill-icon">💻</div><h3>Basic Programming</h3><p>Comfortable with HTML, CSS, and beginner-level scripting to customize templates, fix small bugs, and understand how things work under the hood.</p></div>
+        <div class="skill-card"><div class="skill-icon">⚡</div><h3>Data Automation</h3><p>I set up simple automations using spreadsheet formulas and AI tools to reduce repetitive manual work — saving you hours every week on data entry and reporting.</p></div>
 
       </div>
     </section>
@@ -659,9 +682,6 @@ Virtual Assistant — Admin &amp; Executive Ready</div>
 
         <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Workspace</div>
         <div class="tool-tag"><span class="tool-dot" style="background:#217346"></span>Microsoft 365</div>
-        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Sheets</div>
-        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Docs</div>
-        <div class="tool-tag"><span class="tool-dot" style="background:#0F9D58"></span>Google Drive</div>
         <div class="tool-tag"><span class="tool-dot" style="background:#217346"></span>Microsoft Excel</div>
 
         <div class="tool-tag"><span class="tool-dot" style="background:#4A154B"></span>Slack</div>
@@ -679,13 +699,13 @@ Virtual Assistant — Admin &amp; Executive Ready</div>
       </div>
       <div class="chatgpt-box">
 
-        <div class="section-tag">How I Use ChatGPT</div>
+        <div class="section-tag">How I Prompt in AI</div>
         <ul>
-          <li>Writing and improving customer reply messages</li>
-          <li>Creating email templates and scripts</li>
-          <li>Summarizing long articles or documents into simple points</li>
-          <li>Generating ideas for captions and content posts</li>
-          <li>Helping draft polished messages even when I'm unsure of wording</li>
+          <li>Crafting precise prompts to generate professional customer reply messages</li>
+          <li>Building reusable prompt templates for emails, scripts, and content</li>
+          <li>Using AI to condense long documents into clear, actionable summaries</li>
+          <li>Prompting for creative caption and content ideas tailored to a brand's tone</li>
+          <li>Iterating prompts to refine and polish outputs until they're client-ready</li>
         </ul>
       </div>
     </section>
@@ -832,41 +852,69 @@ Drop a ❤️ if you want this!
      SCRIPTS
 ══════════════════════════════════════ -->
 <script>
-/* ── BACKGROUND VIDEO MOUSE-SCRUB — exact spec ── */
+/* ── BACKGROUND VIDEO — Safari/iOS/Chrome compatible ── */
 (function () {
   const video = document.getElementById('bg-video');
   const SENSITIVITY = 0.8;
   let prevX = null;
   let targetTime = 0;
   let seeking = false;
+  let videoReady = false;
+  let isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+  // Force muted (Safari requires this to be set via JS too)
+  video.muted = true;
+
+  function tryPlay() {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        videoReady = true;
+        document.body.classList.remove('no-video');
+      }).catch(() => {
+        // Autoplay blocked — show CSS fallback
+        document.body.classList.add('no-video');
+      });
+    }
+  }
 
   video.addEventListener('loadedmetadata', () => {
     video.currentTime = 0;
+    tryPlay();
   });
+
+  video.addEventListener('error', () => {
+    document.body.classList.add('no-video');
+  });
+
+  // Timeout fallback: if video hasn't loaded in 4s, show CSS bg
+  setTimeout(() => {
+    if (!videoReady) document.body.classList.add('no-video');
+  }, 4000);
 
   video.addEventListener('seeked', () => {
     seeking = false;
-    // if target moved while we were seeking, seek again
     if (Math.abs(video.currentTime - targetTime) > 0.01) {
       seeking = true;
       video.currentTime = targetTime;
     }
   });
 
-  window.addEventListener('mousemove', (e) => {
-    if (prevX === null) { prevX = e.clientX; return; }
-    const delta = e.clientX - prevX;
-    prevX = e.clientX;
-
-    if (!video.duration) return;
-    const offset = (delta / window.innerWidth) * SENSITIVITY * video.duration;
-    targetTime = Math.max(0, Math.min(video.duration, (targetTime || video.currentTime) + offset));
-
-    if (!seeking) {
-      seeking = true;
-      video.currentTime = targetTime;
-    }
-  });
+  // Mouse scrub — desktop only
+  if (!isTouchDevice) {
+    window.addEventListener('mousemove', (e) => {
+      if (!videoReady || !video.duration) return;
+      if (prevX === null) { prevX = e.clientX; return; }
+      const delta = e.clientX - prevX;
+      prevX = e.clientX;
+      const offset = (delta / window.innerWidth) * SENSITIVITY * video.duration;
+      targetTime = Math.max(0, Math.min(video.duration, (targetTime || video.currentTime) + offset));
+      if (!seeking) {
+        seeking = true;
+        try { video.currentTime = targetTime; } catch(e) {}
+      }
+    });
+  }
 })();
 
 /* ── HAMBURGER MENU ── */
